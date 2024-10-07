@@ -9,25 +9,37 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @State private var name: String = ""
-    @State private var friends: [String] = []
+    @State private var friends: [String] = ["Juan", "Pedro", "Pablo", "Raul", "Bob"]
+    @State private var search: String = ""
+    @State private var filterFriends: [String] = []
     
     var body: some View {
         VStack{
-            TextField("Enter name", text: $name)
-                .textFieldStyle(.roundedBorder)
-                .onSubmit {
-                    friends.append(name)
-                    name = ""
-                }
-            List(friends, id: \.self) { friend in
+            List(filterFriends, id: \.self) { friend in
                 Text(friend)
             }
+            .listStyle(.plain)
+            .searchable(text: $search)
+            .onChange(of: search) {
+                if search.isEmpty {
+                    filterFriends = friends
+                } else {
+                    filterFriends = friends.filter {$0.contains(search)}
+                }
+
+            }
+            
             Spacer()
         }.padding()
+        .onAppear(perform: {
+            filterFriends = friends
+        })
+        .navigationBarTitle("Friends")
     }
 }
 
 #Preview {
-    ContentView()
+    NavigationStack {
+        ContentView()
+    }
 }
